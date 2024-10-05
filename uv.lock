@@ -28,17 +28,6 @@ wheels = [
 ]
 
 [[package]]
-name = "basic-crud"
-version = "0.1.0"
-source = { virtual = "." }
-dependencies = [
-    { name = "fastapi", extra = ["standard"] },
-]
-
-[package.metadata]
-requires-dist = [{ name = "fastapi", extras = ["standard"], specifier = ">=0.115.0" }]
-
-[[package]]
 name = "certifi"
 version = "2024.8.30"
 source = { registry = "https://pypi.org/simple" }
@@ -131,6 +120,17 @@ wheels = [
 standard = [
     { name = "uvicorn", extra = ["standard"] },
 ]
+
+[[package]]
+name = "fastapi-crud"
+version = "0.1.0"
+source = { virtual = "." }
+dependencies = [
+    { name = "fastapi", extra = ["standard"] },
+]
+
+[package.metadata]
+requires-dist = [{ name = "fastapi", extras = ["standard"], specifier = ">=0.115.0" }]
 
 [[package]]
 name = "h11"

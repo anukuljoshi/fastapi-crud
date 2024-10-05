@@ -1,18 +1,35 @@
-FROM python:3.12-slim
+# Use a Python image with uv pre-installed
+FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim
 
-# set environment variables
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV PYTHONUNBUFFERED 1
+# Install the project into `/app`
+WORKDIR /app
 
-# Install uv.
-COPY --from=ghcr.io/astral-sh/uv:0.4.18 /uv /bin/uv
+# Enable bytecode compilation
+ENV UV_COMPILE_BYTECODE=1
 
-# Copy the application into the container.
-COPY . /usr/src/app
+# Copy from the cache instead of linking since it's a mounted volume
+ENV UV_LINK_MODE=copy
 
-# Install the application dependencies.
-WORKDIR /usr/src/app
-RUN uv sync --frozen --no-cache
+# Install the project's dependencies using the lockfile and settings
+RUN --mount=type=cache,target=/root/.cache/uv \
+    --mount=type=bind,source=uv.lock,target=uv.lock \
+    --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
+    uv sync --frozen --no-install-project --no-dev
 
-# Run the application.
-CMD ["/app/.venv/bin/fastapi", "run", "app/main.py", "--port", "80", "--host", "0.0.0.0"]
+# Then, add the rest of the project source code and install it
+# Installing separately from its dependencies allows optimal layer caching
+ADD . /app
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync --frozen --no-dev
+
+# Place executables in the environment at the front of the path
+ENV PATH="/app/.venv/bin:$PATH"
+
+# Set default environment to production (optional, for custom logic)
+ENV FASTAPI_ENV=production
+
+# Reset the entrypoint, don't invoke `uv`
+ENTRYPOINT []
+
+# Run the FastAPI application in production mode
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0"]

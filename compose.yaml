@@ -1,0 +1,32 @@
+services:
+  web:
+    # Build the image from the Dockerfile in the current directory
+    build: .
+
+    # Override the default production command to run in development mode with hot reloading
+    command: "uvicorn app.main:app --reload --host 0.0.0.0 --port 8000"
+
+    # Host the FastAPI application on port 8000
+    ports:
+      - "8000:8000"
+
+    # Set the development environment (optional if you use FASTAPI_ENV in your code)
+    environment:
+      - FASTAPI_ENV=development
+
+    develop:
+      # Create a `watch` configuration to update the application
+      # https://docs.docker.com/compose/file-watch/#compose-watch-versus-bind-mounts
+      watch:
+        # Sync the working directory with the `/app` directory in the container
+        - action: sync
+          path: .
+          target: /app
+          # Exclude the project virtual environment — it could be for a
+          # different platform in the container
+          ignore:
+            - .venv/
+
+        # Rebuild the image on changes to the `pyproject.toml`
+        - action: rebuild
+          path: ./pyproject.toml
