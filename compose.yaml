@@ -4,7 +4,11 @@ services:
     build: .
 
     # Override the default production command to run in development mode with hot reloading
-    command: "uvicorn app.main:app --reload --host 0.0.0.0 --port 8000"
+    command: >
+      sh -c "
+        uv sync --dev &&  # Install dev dependencies
+        uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+      "
 
     # Host the FastAPI application on port 8000
     ports:

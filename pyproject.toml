@@ -8,6 +8,11 @@ dependencies = [
     "fastapi[standard]>=0.115.0",
 ]
 
+[tool.uv]
+dev-dependencies = [
+  "pytest",
+]
+
 [tool.ruff.lint]
 select = [
     "D101",
