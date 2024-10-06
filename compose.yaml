@@ -43,7 +43,7 @@ services:
     expose:
       - 5432  # Expose the internal port for other containers
     ports:
-      - "5432:5432"  # Map container's port 5432 to host's port 5432
+      - "5433:5432"  # Map container's port 5432 to host's port 5432
     environment:
       - POSTGRES_USER=hello_fastapi
       - POSTGRES_PASSWORD=hello_fastapi
