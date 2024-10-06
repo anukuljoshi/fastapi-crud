@@ -4,7 +4,7 @@ from app.models import notes
 from app.schemas.notes import NoteCreate
 
 
-def create_note(db: Session, note: NoteCreate) -> notes.Notes:
+def create_note(db: Session, note: NoteCreate):
     """helper function to create a note using NoteCreate schema
 
     Args:
@@ -21,3 +21,18 @@ def create_note(db: Session, note: NoteCreate) -> notes.Notes:
     db.commit()
     db.refresh(db_note)
     return db_note
+
+
+def list_notes(db: Session):
+    """helper function to create a note using NoteCreate schema
+
+    Args:
+    ----
+        db: db connection
+
+    Returns:
+    -------
+        List of Notes
+    """
+    db_notes = db.query(notes.Notes).all()
+    return db_notes
