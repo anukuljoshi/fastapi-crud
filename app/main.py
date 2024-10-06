@@ -4,6 +4,6 @@ app = FastAPI()
 
 
 @app.get("/ping")
-def pong():
+async def pong():
     """handler for ping check api"""
     return {"ping": "pong!"}
