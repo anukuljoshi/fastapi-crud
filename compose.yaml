@@ -1,49 +1,36 @@
 services:
   web:
-    # Build the image from the Dockerfile in the current directory
     build: .
-
-    # Override the default production command to run in development mode with hot reloading
-    command: >
-      sh -c "
-        uv sync --dev &&  # Install dev dependencies
-        uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
-      "
-
-    # Host the FastAPI application on port 8000
     ports:
       - "8000:8000"
-
-    # Set the development environment (optional if you use FASTAPI_ENV in your code)
     environment:
       - FASTAPI_ENV=development
       - DATABASE_URI=postgresql://hello_fastapi:hello_fastapi@db/hello_fastapi_dev
-
+    command: >
+      sh -c "
+        /app/.venv/bin/alembic upgrade head &&
+        /app/.venv/bin/uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+      "
     develop:
-      # Create a `watch` configuration to update the application
-      # https://docs.docker.com/compose/file-watch/#compose-watch-versus-bind-mounts
       watch:
-        # Sync the working directory with the `/app` directory in the container
         - action: sync
-          path: .
-          target: /app
-          # Exclude the project virtual environment — it could be for a
-          # different platform in the container
+          path: ./
+          target: /app/
           ignore:
             - .venv/
-
-        # Rebuild the image on changes to the `pyproject.toml`
         - action: rebuild
           path: ./pyproject.toml
+    depends_on:
+      - db
 
   db:
     image: postgres:17.0-alpine
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     expose:
-      - 5432  # Expose the internal port for other containers
+      - 5432
     ports:
-      - "5433:5432"  # Map container's port 5432 to host's port 5432
+      - "5433:5432"
     environment:
       - POSTGRES_USER=hello_fastapi
       - POSTGRES_PASSWORD=hello_fastapi

@@ -7,11 +7,11 @@ from app.crud import notes as notes_crud
 from app.dependencies import get_db
 from app.schemas import notes as notes_schema
 
-router = APIRouter()
+router = APIRouter(prefix="/notes", tags=["notes"])
 
 
 @router.post(
-    "/notes",
+    "/",
     response_model=notes_schema.Note,
     status_code=status.HTTP_201_CREATED,
 )
@@ -34,7 +34,7 @@ async def notes_create(
 
 
 @router.get(
-    "/notes",
+    "/",
     response_model=List[notes_schema.Note],
 )
 async def notes_list(
